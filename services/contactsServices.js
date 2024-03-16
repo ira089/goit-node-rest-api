@@ -54,3 +54,4 @@ export async function updateContact(contactId, data) {
     await updateContacts(contacts);
     return contacts[index];
   }
+  

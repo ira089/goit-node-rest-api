@@ -24,12 +24,6 @@
     "phone": "(501) 472-5218"
   },
   {
-    "id": "1DEXoP8AuCGYc1YgoQ6hw",
-    "name": "Abbot Franks",
-    "email": "scelerisque@magnis.org",
-    "phone": "(186) 568-3720"
-  },
-  {
     "id": "Z5sbDlS7pCzNsnAHLtDJd",
     "name": "Reuben Henry",
     "email": "pharetra.ut@dictum.co.uk",
@@ -43,7 +37,7 @@
   },
   {
     "id": "e6ywwRe4jcqxXfCZOj_1e",
-    "name": "Thomas Lucas",
+    "name": "Thomas Lucas!!!",
     "email": "nec@Nulla.com",
     "phone": "(704) 398-7993"
   },
@@ -56,6 +50,12 @@
   {
     "id": "47BZ4lu-ZHaBqHdR0Vavw",
     "name": "Kacha",
+    "email": "macha@egetlacus.ca",
+    "phone": "987654"
+  },
+  {
+    "id": "5662GeLBbBUNDyi6q7otl",
+    "name": "Sacha",
     "email": "macha@egetlacus.ca",
     "phone": "987654"
   }
