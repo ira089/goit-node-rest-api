@@ -26,11 +26,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-// app.listen(3000, () => {
-//   console.log("Server is running. Use our API on port: 3000");
-// });
-
-// const DB_HOST = 'mongodb+srv://gvir2015:PEurQbs6Y9DEyDC4@cluster0.8tqm2h7.mongodb.net/db-contacts?retryWrites=true&w=majority&appName=Cluster0'
 mongoose.connect(DB_HOST)
 .then(()=> {
   app.listen(PORT, () => {
@@ -39,7 +34,6 @@ mongoose.connect(DB_HOST)
   
 })
 .catch(error => {
-  console.error('Server is running. Use our API on port')
-  // console.error(`Server is running. Use our API on port: ${PORT}`)
+  console.error(error.message)
   process.exit(1)
 })
