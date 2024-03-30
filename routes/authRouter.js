@@ -5,6 +5,9 @@ import { isValidId } from "../middlewares/isValidId.js";
 import validateBody from '../helpers/validateBody.js'
 
 const authRouter = express.Router();
+
 authRouter.post("/register", validateBody(userSignupSchema),authControllers.signup);
-// authRouter.post("/signup", validateBody(userSignupSchema),authControllers.signup);
+
+authRouter.post("/login", validateBody(userSignupSchema),authControllers.signin);
+
 export default authRouter
