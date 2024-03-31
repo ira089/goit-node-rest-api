@@ -7,7 +7,6 @@ const {JWT_SECRET} = process.env;
 
 const authenticate = async (req, res, next) => { 
     const {authorization} = req.headers;
-    // console.log(authorization)
     if(!authorization){
         return next(HttpError(401, "Not authorized"))  
       }
@@ -20,6 +19,9 @@ const authenticate = async (req, res, next) => {
       const user = await findUser({_id: id});
       if (!user) {
         return next(HttpError(401, "User not found")) }
+      if (!user.token) {
+        return next(HttpError(401, "Not authorized"))  
+      }
         req.user = user;
         next()
     }
