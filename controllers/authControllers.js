@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import "dotenv/config.js"
 import HttpError from '../helpers/HttpError.js'
 import * as authServices from '../services/authServices.js'
+import fs from "fs/promises";
+
 
 const {JWT_SECRET} = process.env;
 
@@ -30,6 +32,8 @@ res.status(201).json({
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
+    console.log(req.body)
+    console.log(req.file)
     try {
         const user = await authServices.findUser({email});
         if(!user) {
@@ -42,7 +46,7 @@ export const signin =  async (req, res, next) => {
 
         const{_id: id} = user;
         const payload = {id};
-        console.log(JWT_SECRET)
+        
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
         await authServices.updateUser ({_id: id}, {token});
 
