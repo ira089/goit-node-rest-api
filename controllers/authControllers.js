@@ -4,7 +4,9 @@ import "dotenv/config.js"
 import HttpError from '../helpers/HttpError.js'
 import * as authServices from '../services/authServices.js'
 import fs from "fs/promises";
+import path from "path";
 
+const avatarPath = path.resolve("public", "avatars");
 
 const {JWT_SECRET} = process.env;
 
@@ -32,8 +34,14 @@ res.status(201).json({
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
-    console.log(req.body)
+const {path: oldPath, filename} = req.file;
+const newPath = path.join(avatarPath, filename);
+console.log(filename)
+console.log(newPath)
+console.log(oldPath)
+    // console.log(req.body)
     console.log(req.file)
+   
     try {
         const user = await authServices.findUser({email});
         if(!user) {
@@ -46,13 +54,21 @@ export const signin =  async (req, res, next) => {
 
         const{_id: id} = user;
         const payload = {id};
+
+        await fs.rename(oldPath, newPath);
         
+        const avatar = path.join( "avatars", filename);
+        console.log(avatar)
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
-        await authServices.updateUser ({_id: id}, {token});
+        await authServices.updateUser ({_id: id}, {token, avatar});
+        // await fs.unlink(req.file.path);
+       
+        
 
 res.status(201).json({
     "token" : token,
     "user": {
+        avatar: user.avatar,
         email: user.email,
         subscription: user.subscription,}
 })
