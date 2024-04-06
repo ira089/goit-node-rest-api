@@ -22,7 +22,7 @@ const userShema = new Schema({
       type: String,
       default: null,
     },
-    avatar: {
+    avatarURL: {
       type: String,
       required: true,
     }

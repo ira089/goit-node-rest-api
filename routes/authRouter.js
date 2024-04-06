@@ -9,12 +9,15 @@ const authRouter = express.Router();
 
 authRouter.post("/register", validateBody(usersSchemas.userSignupSchema),authControllers.signup);
 
-authRouter.post("/login", upload.single("tiger"), validateBody(usersSchemas.userSignupSchema),authControllers.signin);
+authRouter.post("/login", validateBody(usersSchemas.userSignupSchema),authControllers.signin);
 
 authRouter.get("/current", authenticate, authControllers.getCurrent );
 
 authRouter.post("/logout", authenticate, authControllers.signout );
 
 authRouter.patch("/", validateBody(usersSchemas.userUpSubcription), authenticate, authControllers.updateSubscription );
+
+authRouter.post("/avatars", authenticate, upload.single("avatar"), authControllers.updateAvatar );
+// upload.single("tiger")
 
 export default authRouter

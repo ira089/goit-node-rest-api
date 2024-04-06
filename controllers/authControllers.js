@@ -5,6 +5,7 @@ import HttpError from '../helpers/HttpError.js'
 import * as authServices from '../services/authServices.js'
 import fs from "fs/promises";
 import path from "path";
+import gravatar from "gravatar";
 
 const avatarPath = path.resolve("public", "avatars");
 
@@ -19,12 +20,15 @@ export const signup =  async (req, res, next) => {
             throw HttpError(409, "Email in use")
         }
         const hashPassword = await bcryptjs.hash(password, 10);
-      const newUser = await authServices.signup ({...req.body, password: hashPassword});
+        const avatarURL = gravatar.url(email);
+      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL});
 
 res.status(201).json({
     "user": {
         email: newUser.email,
-        subscription: newUser.subscription,}
+        subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
+    }
 })
     }
     catch (error) {
@@ -34,13 +38,13 @@ res.status(201).json({
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
-const {path: oldPath, filename} = req.file;
-const newPath = path.join(avatarPath, filename);
-console.log(filename)
-console.log(newPath)
-console.log(oldPath)
+// const {path: oldPath, filename} = req.file;
+// const newPath = path.join(avatarPath, filename);
+// console.log(filename)
+// console.log(newPath)
+// console.log(oldPath)
     // console.log(req.body)
-    console.log(req.file)
+    // console.log(req.file)
    
     try {
         const user = await authServices.findUser({email});
@@ -55,25 +59,26 @@ console.log(oldPath)
         const{_id: id} = user;
         const payload = {id};
 
-        await fs.rename(oldPath, newPath);
+        // await fs.rename(oldPath, newPath);
         
-        const avatar = path.join( "avatars", filename);
-        console.log(avatar)
+        // const avatarURL = path.join( "avatars", filename);
+        // console.log(avatarURL)
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
-        await authServices.updateUser ({_id: id}, {token, avatar});
-        // await fs.unlink(req.file.path);
+        await authServices.updateUser ({_id: id}, {token});
+        
        
         
 
 res.status(201).json({
     "token" : token,
     "user": {
-        avatar: user.avatar,
+        // avatarURL: user.avatar,
         email: user.email,
         subscription: user.subscription,}
 })
     }
     catch (error) {
+        // await fs.unlink(req.file.path)
         next(error)
     }
 };
@@ -110,6 +115,24 @@ res.status(200).json(
     subscription})
     }
     catch (error) {
+        next(error)
+    }
+};
+
+export const  updateAvatar =  async (req, res, next) => { 
+    const{_id} = req.user;
+    const {path: oldPath, filename} = req.file;
+    const newPath = path.join(avatarPath, filename);
+    try {
+        await fs.rename(oldPath, newPath);
+        const avatarURL = path.join( "avatars", filename);
+        console.log(avatarURL)
+        await authServices.updateUser({_id}, {avatarURL});
+res.status(200).json( 
+    {avatarURL})
+    }
+    catch (error) {
+        await fs.unlink(oldPath)
         next(error)
     }
 };
