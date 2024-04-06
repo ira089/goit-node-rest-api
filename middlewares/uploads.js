@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import HttpError from "../helpers/HttpError.js"
+import Jimp from "jimp";
 
 const destination = path.resolve("tmp")
 
@@ -18,6 +19,7 @@ const limits =  {
 }
 
 const fileFilter = (req, file, callback)=> {
+    
     const extention = file.originalname.split(".").pop();
     if (extention === "exe") {
         return callback (HttpError(400, ".exe extention not allow"))

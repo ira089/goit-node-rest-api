@@ -6,6 +6,7 @@ import * as authServices from '../services/authServices.js'
 import fs from "fs/promises";
 import path from "path";
 import gravatar from "gravatar";
+import Jimp from "jimp";
 
 const avatarPath = path.resolve("public", "avatars");
 
@@ -122,8 +123,11 @@ res.status(200).json(
 export const  updateAvatar =  async (req, res, next) => { 
     const{_id} = req.user;
     const {path: oldPath, filename} = req.file;
+    const img = await Jimp.read(oldPath);
+    
     const newPath = path.join(avatarPath, filename);
     try {
+        await img.cover(250, 250).writeAsync(oldPath)
         await fs.rename(oldPath, newPath);
         const avatarURL = path.join( "avatars", filename);
         console.log(avatarURL)
