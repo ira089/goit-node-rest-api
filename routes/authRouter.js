@@ -18,6 +18,5 @@ authRouter.post("/logout", authenticate, authControllers.signout );
 authRouter.patch("/", validateBody(usersSchemas.userUpSubcription), authenticate, authControllers.updateSubscription );
 
 authRouter.post("/avatars", authenticate, upload.single("avatar"), authControllers.updateAvatar );
-// upload.single("tiger")
 
 export default authRouter

@@ -1,7 +1,6 @@
 import multer from "multer";
 import path from "path";
 import HttpError from "../helpers/HttpError.js"
-import Jimp from "jimp";
 
 const destination = path.resolve("tmp")
 
