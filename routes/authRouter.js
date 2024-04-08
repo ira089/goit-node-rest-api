@@ -9,7 +9,7 @@ const authRouter = express.Router();
 
 authRouter.post("/register", validateBody(usersSchemas.userSignupSchema),authControllers.signup);
 
-authRouter.post("/login", validateBody(usersSchemas.userSignupSchema),authControllers.signin);
+authRouter.patch("/login", validateBody(usersSchemas.userSignupSchema),authControllers.signin);
 
 authRouter.get("/current", authenticate, authControllers.getCurrent );
 

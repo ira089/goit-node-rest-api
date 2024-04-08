@@ -12,7 +12,6 @@ const avatarPath = path.resolve("public", "avatars");
 
 const {JWT_SECRET} = process.env;
 
-
 export const signup =  async (req, res, next) => { 
     const{email, password} = req.body;
     try {
@@ -39,14 +38,7 @@ res.status(201).json({
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
-// const {path: oldPath, filename} = req.file;
-// const newPath = path.join(avatarPath, filename);
-// console.log(filename)
-// console.log(newPath)
-// console.log(oldPath)
-    // console.log(req.body)
-    // console.log(req.file)
-   
+  
     try {
         const user = await authServices.findUser({email});
         if(!user) {
@@ -59,27 +51,20 @@ export const signin =  async (req, res, next) => {
 
         const{_id: id} = user;
         const payload = {id};
-
-        // await fs.rename(oldPath, newPath);
-        
-        // const avatarURL = path.join( "avatars", filename);
-        // console.log(avatarURL)
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
         await authServices.updateUser ({_id: id}, {token});
         
        
         
 
-res.status(201).json({
+res.status(200).json({
     "token" : token,
     "user": {
-        // avatarURL: user.avatar,
         email: user.email,
         subscription: user.subscription,}
 })
     }
     catch (error) {
-        // await fs.unlink(req.file.path)
         next(error)
     }
 };
@@ -122,11 +107,18 @@ res.status(200).json(
 
 export const  updateAvatar =  async (req, res, next) => { 
     const{_id} = req.user;
+    
+    try {
+        if(!req.file) {
+          
+            
+        throw HttpError(400, "Avatar not found");
+        
+    }
     const {path: oldPath, filename} = req.file;
-    const img = await Jimp.read(oldPath);
     
     const newPath = path.join(avatarPath, filename);
-    try {
+        const img = await Jimp.read(oldPath);
         await img.cover(250, 250).writeAsync(oldPath)
         await fs.rename(oldPath, newPath);
         const avatarURL = path.join( "avatars", filename);
@@ -136,7 +128,7 @@ res.status(200).json(
     {avatarURL})
     }
     catch (error) {
-        await fs.unlink(oldPath)
+        // await fs.unlink(oldPath)
         next(error)
     }
 };
