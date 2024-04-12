@@ -7,10 +7,12 @@ import fs from "fs/promises";
 import path from "path";
 import gravatar from "gravatar";
 import Jimp from "jimp";
+import { nanoid } from "nanoid";
+import sendEmail from "../helpers/sendEmail.js";
 
 const avatarPath = path.resolve("public", "avatars");
 
-const {JWT_SECRET} = process.env;
+const {JWT_SECRET, PROJECT_URL} = process.env;
 
 export const signup =  async (req, res, next) => { 
     const{email, password} = req.body;
@@ -20,8 +22,17 @@ export const signup =  async (req, res, next) => {
             throw HttpError(409, "Email in use")
         }
         const hashPassword = await bcryptjs.hash(password, 10);
+        const verificationCode = nanoid();
         const avatarURL = gravatar.url(email);
-      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL});
+
+      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL, verificationCode});
+const verifyEmail ={
+    to: newUser.email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${PROJECT_URL}/api/users/verify/${verificationCode}"> Click verify email</a>`
+}
+
+await sendEmail(verifyEmail);
 
 res.status(201).json({
     "user": {
@@ -36,6 +47,26 @@ res.status(201).json({
     }
 };
 
+export const verify =  async (req, res, next) => { 
+    const {verificationCode} = req.params;
+    try {
+        const user = await authServices.findUser({verificationCode});
+        if(!user) {
+            throw HttpError(404, "Email not found or already verifed")
+        }
+        await authServices.updateUser({_id: user._id}, {verify:true, verificationCode: ""})
+     
+res.status(201).json({
+   message: "Email verify success" 
+    
+})
+    }
+    catch (error) {
+        next(error)
+    }
+};
+
+
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
   
@@ -44,6 +75,10 @@ export const signin =  async (req, res, next) => {
         if(!user) {
             throw HttpError(401, "Email or password is wrong");
         }
+        if(!user.verify) {
+            throw HttpError(401, "Email not verify");
+        }
+
         const passwordCompane = await bcryptjs.compare(password, user.password);
         if (!passwordCompane) {
             throw HttpError(401, "Email or password is wrong");
@@ -52,10 +87,7 @@ export const signin =  async (req, res, next) => {
         const{_id: id} = user;
         const payload = {id};
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
-        await authServices.updateUser ({_id: id}, {token});
-        
-       
-        
+        await authServices.updateUser ({_id: id}, {token});     
 
 res.status(200).json({
     "token" : token,
