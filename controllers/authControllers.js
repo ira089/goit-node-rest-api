@@ -3,9 +3,14 @@ import jwt from "jsonwebtoken";
 import "dotenv/config.js"
 import HttpError from '../helpers/HttpError.js'
 import * as authServices from '../services/authServices.js'
+import fs from "fs/promises";
+import path from "path";
+import gravatar from "gravatar";
+import Jimp from "jimp";
+
+const avatarPath = path.resolve("public", "avatars");
 
 const {JWT_SECRET} = process.env;
-
 
 export const signup =  async (req, res, next) => { 
     const{email, password} = req.body;
@@ -15,12 +20,15 @@ export const signup =  async (req, res, next) => {
             throw HttpError(409, "Email in use")
         }
         const hashPassword = await bcryptjs.hash(password, 10);
-      const newUser = await authServices.signup ({...req.body, password: hashPassword});
+        const avatarURL = gravatar.url(email);
+      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL});
 
 res.status(201).json({
     "user": {
         email: newUser.email,
-        subscription: newUser.subscription,}
+        subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
+    }
 })
     }
     catch (error) {
@@ -30,6 +38,7 @@ res.status(201).json({
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
+  
     try {
         const user = await authServices.findUser({email});
         if(!user) {
@@ -42,11 +51,13 @@ export const signin =  async (req, res, next) => {
 
         const{_id: id} = user;
         const payload = {id};
-        console.log(JWT_SECRET)
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
         await authServices.updateUser ({_id: id}, {token});
+        
+       
+        
 
-res.status(201).json({
+res.status(200).json({
     "token" : token,
     "user": {
         email: user.email,
@@ -90,6 +101,34 @@ res.status(200).json(
     subscription})
     }
     catch (error) {
+        next(error)
+    }
+};
+
+export const  updateAvatar =  async (req, res, next) => { 
+    const{_id} = req.user;
+    
+    try {
+        if(!req.file) {
+          
+            
+        throw HttpError(400, "Avatar not found");
+        
+    }
+    const {path: oldPath, filename} = req.file;
+    
+    const newPath = path.join(avatarPath, filename);
+        const img = await Jimp.read(oldPath);
+        await img.cover(250, 250).writeAsync(oldPath)
+        await fs.rename(oldPath, newPath);
+        const avatarURL = path.join( "avatars", filename);
+        console.log(avatarURL)
+        await authServices.updateUser({_id}, {avatarURL});
+res.status(200).json( 
+    {avatarURL})
+    }
+    catch (error) {
+        // await fs.unlink(oldPath)
         next(error)
     }
 };
