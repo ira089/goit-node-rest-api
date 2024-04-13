@@ -12,29 +12,6 @@ import contactsRouter from "./routes/contactsRouter.js";
 dotenv.config();
 const {DB_HOST, PORT = 3000} = process.env;
 
-// отправка почты
-// const {DB_HOST, PORT = 3000, UKR_NET_PASSWORD, UKR_NET_FROM} = process.env;
-// const nodemailerConfig = {
-//   host: "smtp.ukr.net",
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: UKR_NET_FROM,
-//     pass: UKR_NET_PASSWORD,
-//   }
-// }
-// const transport = nodemailer.createTransport(nodemailerConfig);
-// const email = {
-//   from: UKR_NET_FROM,
-//   to: "gvir2015@gmail.com",
-//   subject: "Test HW06",
-//   html: "<strong>Hello! Test email</strong>"
-// }
-// transport.sendMail(email)
-// .then(() => console.log("test email success"))
-// .catch(error => console.log(error.message))
-// конец отправка почты
-
 const app = express();
 
 app.use(morgan("tiny"));

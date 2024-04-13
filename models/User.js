@@ -2,6 +2,7 @@ import {  Schema, model } from "mongoose";
 import * as hooks from './hooks.js'
 import { emailRegepxp } from "../constants/userConstants.js";
 
+
 const userShema = new Schema({
     password: {
       type: String,
@@ -30,8 +31,9 @@ const userShema = new Schema({
       type: Boolean,
       default:false,
     },
-    verificationCode: {
+    verificationToken: {
       type: String,
+      // required: [true, 'Verify token is required'],
     }
 
   },{versionKey: false, timestamps:true})
