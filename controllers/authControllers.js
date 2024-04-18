@@ -7,10 +7,12 @@ import fs from "fs/promises";
 import path from "path";
 import gravatar from "gravatar";
 import Jimp from "jimp";
+import { nanoid } from "nanoid";
+import sendEmail from "../helpers/sendEmail.js";
 
 const avatarPath = path.resolve("public", "avatars");
 
-const {JWT_SECRET} = process.env;
+const {JWT_SECRET, PROJECT_URL} = process.env;
 
 export const signup =  async (req, res, next) => { 
     const{email, password} = req.body;
@@ -20,8 +22,17 @@ export const signup =  async (req, res, next) => {
             throw HttpError(409, "Email in use")
         }
         const hashPassword = await bcryptjs.hash(password, 10);
+        const verificationToken= nanoid();
         const avatarURL = gravatar.url(email);
-      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL});
+
+      const newUser = await authServices.signup ({...req.body, password: hashPassword, avatarURL, verificationToken});
+const verifyEmail ={
+    to: newUser.email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${PROJECT_URL}/api/users/verify/${verificationToken}"> Click verify email</a>`
+}
+
+await sendEmail(verifyEmail);
 
 res.status(201).json({
     "user": {
@@ -34,7 +45,56 @@ res.status(201).json({
     catch (error) {
         next(error)
     }
+}
+
+export const verify =  async (req, res, next) => { 
+    const {verificationToken} = req.params;
+    try {
+        const user = await authServices.findUser({verificationToken});
+        if(!user) {
+            throw HttpError(404, "User not found")
+        }
+        await authServices.updateUser({_id: user._id}, {verify:true, verificationToken: ""})
+     
+res.status(200).json({
+   message: "Verification successful" 
+    
+})
+    }
+    catch (error) {
+        next(error)
+    }
 };
+
+export const resendVerify =  async (req, res, next) => { 
+    const {email} = req.body;
+    try {
+        const user = await authServices.findUser({email});
+        if(!user) {
+            throw HttpError(404, "Email not found")
+        }
+
+        if(user.verify) {
+            throw HttpError(400, "Verification has already been passed")
+        }
+        const verifyEmail ={
+            to: email,
+            subject: "Verify email",
+            html: `<a target="_blank" href="${PROJECT_URL}/api/users/verify/${user.verificationToken}"> Click verify email</a>`
+        }
+        
+        await sendEmail(verifyEmail);
+           
+res.status(201).json({
+   message: "Verification email sent"
+})
+    }
+    catch (error) {
+        next(error)
+    }
+};
+
+
 
 export const signin =  async (req, res, next) => { 
     const{email, password} = req.body;
@@ -44,6 +104,10 @@ export const signin =  async (req, res, next) => {
         if(!user) {
             throw HttpError(401, "Email or password is wrong");
         }
+        if(!user.verify) {
+            throw HttpError(401, "Email not verify");
+        }
+
         const passwordCompane = await bcryptjs.compare(password, user.password);
         if (!passwordCompane) {
             throw HttpError(401, "Email or password is wrong");
@@ -52,10 +116,7 @@ export const signin =  async (req, res, next) => {
         const{_id: id} = user;
         const payload = {id};
         const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "27h"});
-        await authServices.updateUser ({_id: id}, {token});
-        
-       
-        
+        await authServices.updateUser ({_id: id}, {token});     
 
 res.status(200).json({
     "token" : token,
@@ -132,3 +193,5 @@ res.status(200).json(
         next(error)
     }
 };
+
+
