@@ -15,7 +15,111 @@ datasource db {
 
 model User {
   id        Int     @id @default(autoincrement())
-  name      String
   email     String  @unique
-  createdAt DateTime @default(now())
+  password String @unique
+  role Role
+  fitstName      String @db.VarChar(100) @map("first_name")
+  lastName      String @db.VarChar(100)  @map("last_name")
+  timezone String
+  positionId Int? 
+  position   Position? @relation(fields: [positionId], references: [id])
+  skills Skill[] 
+  sectors Sector[]
+  phone String @db.VarChar(20)
+  linkedin String?
+  slack String?
+  telegram String?
+  userStartDate DateTime @default(now()) @map("user_start_date")
+  isVerified Boolean @default(false) @map("is_verified")
+  experience String @db.Text
+  userPhoto String? @db.VarChar(255) @map("user_photo")
+  projects Project[] 
+ writtenReviews  Review[] @relation("Author")  // Отзывы, которые пользователь написал
+  receivedReviews Review[] @relation("Reviewed")  // Отзывы, которые написали про него
+  
+ @@map("users") 
+}
+
+enum Role {
+TRAINEE
+MENTOR
+PARTNER
+
+@@map("roles")
+}
+
+model Position {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("position_name") 
+users    User[] // Связь "один ко многим" — одна позиция у многих юзеров 
+  project Project[]
+
+  @@map("positions")
+}
+
+model Skill {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("skill_name") 
+users    User[]
+project Project[]
+
+  @@map("skills")
+}
+
+model Project {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("project_name") 
+photo String? @db.VarChar(100) @map("project_photo") 
+shortDescription String @db.VarChar(100) @map("short_description") 
+description String? @db.Text  
+goals String
+projectStartDate DateTime @default(now()) @map("project_start_date")
+deadline DateTime
+sectorId Int
+sector  Sector @relation(fields: [sectorId], references: [id])
+stakeholderId Int
+stakeholder Stakeholder @relation(fields: [stakeholderId], references: [id])
+skills Skill[]
+users    User[]
+positions Position[]
+projectStatus ProjectStatus
+
+  @@map("projects")
+}
+
+enum ProjectStatus {
+STARTPROJECT
+FINICHPROJECT
+}
+
+model Stakeholder {
+id        Int     @id @default(autoincrement())
+email     String  @unique
+fitstName      String @db.VarChar(100) @map("first_name_stakeholder")
+ lastName      String @db.VarChar(100)  @map("last_name_stakeholder")
+  phone String @db.VarChar(20) @map("phone_stakeholder")
+projects Project[] 
+
+  @@map("stakeholders")
+}
+
+model Sector {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("sector_name") 
+users    User[] 
+projects Project[] 
+
+  @@map("sectors")
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  text String @db.Text @map("text_review")
+  author     User       @relation("Author", fields: [authorId], references: [id])
+  authorId   Int
+
+  reviewedUser User @relation("Reviewed", fields: [reviewedUserId], references: [id]) // На кого отзыв
+  reviewedUserId Int
+
+@@map("reviews")
 }
