@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 async function seedSkills() {
   for (const sector of SECTOR) {
-    await prisma.user.upsert({
-      where: { fitstName: sector },
+    await prisma.sector.upsert({
+      where: { name: sector },
       update: {},
-      create: { fitstName: sector },
+      create: { name: sector },
     });
   }
 
