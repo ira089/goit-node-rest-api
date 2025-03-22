@@ -1,0 +1,26 @@
+model Review {
+  id        Int     @id @default(autoincrement())
+  text String @db.Text @map("text_review")
+  author     User       @relation("Author", fields: [authorId], references: [id])
+  authorId   Int
+
+  reviewedUser User @relation("Reviewed", fields: [reviewedUserId], references: [id]) // На кого отзыв
+  reviewedUserId Int
+
+@@map("reviews")
+}
+
+model Demo {
+id       Int     @id @default(autoincrement())
+demoDate DateTime @map("demo_date")
+demoTime String @map("demo_time")
+meetingLink String @map("meeting_link")
+
+demoProject Project @relation(fields: [demoProjectId], references: [id])
+demoProjectId Int
+
+demoUser User[]
+
+  @@map("demos")
+}
+

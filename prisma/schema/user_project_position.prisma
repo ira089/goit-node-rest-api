@@ -1,0 +1,17 @@
+model UserProjectPosition {
+  id         Int     @id @default(autoincrement())
+
+   user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+
+  project    Project   @relation(fields: [projectId], references: [id])
+  projectId  Int
+
+  position   Position  @relation(fields: [positionId], references: [id])
+  positionId Int
+
+  joinedAt   DateTime  @default(now()) 
+
+  @@unique([userId, projectId, positionId]) // Один юзер не может иметь одну и ту же специальность в проекте дважды
+  @@map("user_project_positions")
+}

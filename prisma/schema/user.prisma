@@ -1,0 +1,53 @@
+model User {
+  id       Int     @id @default(autoincrement())
+
+  email     String  @unique
+  password String 
+  target Target
+  firstName      String @db.VarChar(100) @map("first_name")
+  lastName      String @db.VarChar(100)  @map("last_name")
+  phone String @db.VarChar(20)
+   userPhoto String? @db.VarChar(255) @map("user_photo")
+
+  linkedin String?
+  slack String?
+  telegram String?
+
+  scheduleStart String @map("schedule_start")
+  scheduleEnd String @map("schedule_end")
+
+  userStartDate DateTime @default(now()) @map("user_start_date")
+  growthPlan String? @db.Text @map("growth_plan")
+  experience String? @db.Text
+
+  skills Skill[] 
+  projects UserProjectPosition[] 
+  demos Demo[]
+  
+   isVerified Boolean @default(false) @map("is_verified")
+   isAdmin Boolean @default(false) @map("is_admin")
+
+ writtenReviews  Review[] @relation("Author")  // Отзывы, которые пользователь написал
+  receivedReviews Review[] @relation("Reviewed")  // Отзывы, которые написали про него
+  
+ @@map("users") 
+ @@index([firstName])
+ @@index([lastName])
+}
+
+enum Target {
+TRAINEE
+MENTOR
+PARTNER
+
+@@map("target")
+}
+
+model Skill {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("skill_name") 
+users    User[]
+project Project[]
+
+  @@map("skills")
+}

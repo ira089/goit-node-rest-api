@@ -1,0 +1,74 @@
+model Project {
+id       Int     @id @default(autoincrement())
+
+name     String  @db.VarChar(100) @map("project_name") 
+photo String? @db.VarChar(100) @map("project_photo") 
+shortDescription String? @db.VarChar(100) @map("short_description") 
+description String? @db.Text  
+goals String
+projectStartDate DateTime @default(now()) @map("project_start_date")
+deadline DateTime?
+projectStatus ProjectStatus
+
+sectorId Int
+sector  Sector @relation(fields: [sectorId], references: [id])
+
+stakeholder Stakeholder[]
+skills Skill[]
+users    UserProjectPosition[]
+demos Demo[]
+links String[]
+
+
+  @@map("projects")
+  @@index([name])
+}
+
+enum ProjectStatus {
+ unstaffed    //Неукомплектований
+	staffed   //Укомплектований
+	blocked    //Заблокований
+	frozen   //Заморожений
+	completed   //Завершений
+}
+
+model Position {
+id       Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("position_name") 
+category CategoryEnum
+
+users    UserProjectPosition[] 
+
+  @@map("positions")
+  @@index([name])
+  @@index([category])
+}
+
+enum CategoryEnum {
+  Розробка
+  Менеджмент
+  Дизайн
+  Маркетинг
+  Інші
+}
+
+model Sector {
+id        Int     @id @default(autoincrement())
+name     String  @db.VarChar(100) @map("sector_name") 
+projects Project[] 
+
+  @@map("sectors")
+}
+
+model Stakeholder {
+ id        Int     @id @default(autoincrement())
+ email     String  @unique
+ firstName      String @db.VarChar(100) @map("first_name_stakeholder")
+ lastName      String @db.VarChar(100)  @map("last_name_stakeholder")
+ phone String @db.VarChar(20) @map("phone_stakeholder")
+  photo String? @db.VarChar(255) @map("stakeholder_photo")
+
+ projects Project[] 
+
+  @@map("stakeholders")
+}
