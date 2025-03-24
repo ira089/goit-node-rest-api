@@ -45,7 +45,7 @@ PARTNER
 
 model Skill {
 id        Int     @id @default(autoincrement())
-name     String  @db.VarChar(100) @map("skill_name") 
+name     String  @db.VarChar(100) @unique @map("skill_name") 
 users    User[]
 project Project[]
 

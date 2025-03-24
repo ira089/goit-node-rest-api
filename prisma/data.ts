@@ -150,3 +150,50 @@ export const SECTOR = [
   "HR Tech",
   "Gaming",
 ];
+
+export const POSITIONS_DEVELOPMENT = [
+  "Software Engineer",
+  "Front-end Developer",
+  "Back-end Developer",
+  "Full-stack Developer",
+  "Mobile Developer",
+  "Game Developer",
+  "DevOps Engineer",
+  "Data Engineer",
+  "Data Scientist",
+  "AI Engineer",
+  "Cybersecurity Engineer",
+  "Network Engineer",
+  "Database Administrator",
+  "System Administrator",
+  "QA Engineer",
+  "Blockchain Developer",
+  "AR/VR Developer",
+  "Tech Lead",
+  "Software Architect",
+];
+
+export const POSITIONS_MANAGEMENT = [
+  "Project Manager",
+  "Product Manager",
+  "Scrum Master",
+  "Business Analyst",
+];
+
+export const POSITIONS_DESIGN = ["UI/UX Designer", "Graphic Designer"];
+
+export const POSITIONS_MARKETING = [
+  "Sales Manager",
+  "Marketing Manager",
+  "SEO Specialist",
+  "SMM Manager",
+  "Affiliate Manager",
+  "Account Manager",
+];
+
+export const POSITIONS_OTHERS = [
+  "Legal Counsel",
+  "Finance Manager",
+  "Technical Writer",
+  "HR Manage",
+];

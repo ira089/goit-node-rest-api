@@ -1,15 +1,11 @@
-// import { PrismaClient } from "@prisma/client";
-// import { POSITIONS, SKILLS, SECTOR } from './data';
-
-// const prisma = new PrismaClient();
 import seedSectors from "./seedSectors";
-// import { seedProjects } from "./seedProjects"; // позже
-// import { seedUsers } from "./seedUsers"; // позже
+// import seedSkills from "./seedSkills";
+// import seedPositions from "./seedPositions";
 
 async function main() {
   await seedSectors();
-  // await seedProjects(); // позже
-  // await seedUsers(); // позже
+  // await seedSkills();
+  // await seedPositions();
 }
 
 main().catch(console.error);

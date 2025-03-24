@@ -34,7 +34,7 @@ enum ProjectStatus {
 
 model Position {
 id       Int     @id @default(autoincrement())
-name     String  @db.VarChar(100) @map("position_name") 
+name     String  @db.VarChar(100) @unique @map("position_name") 
 category CategoryEnum
 
 users    UserProjectPosition[] 

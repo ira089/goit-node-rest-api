@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "./prismaClient";
 import { SECTOR } from "./data";
-
-const prisma = new PrismaClient();
 
 async function seedSectors() {
   await prisma.sector.deleteMany();
-
+  console.log("sector");
   for (const sector of SECTOR) {
     const existingSector = await prisma.sector.findUnique({
       where: { name: sector },
