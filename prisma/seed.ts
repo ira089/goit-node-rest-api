@@ -2,12 +2,12 @@
 // import { POSITIONS, SKILLS, SECTOR } from './data';
 
 // const prisma = new PrismaClient();
-import seedSkills from "./seedSkills";
+import seedSectors from "./seedSectors";
 // import { seedProjects } from "./seedProjects"; // позже
 // import { seedUsers } from "./seedUsers"; // позже
 
 async function main() {
-  await seedSkills();
+  await seedSectors();
   // await seedProjects(); // позже
   // await seedUsers(); // позже
 }
